@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+/* PrabhasBot — Glassy dark gradient design system. All colors HSL. */
+
+@layer base {
+  :root {
+    --background: 240 30% 6%;
+    --foreground: 220 30% 96%;
+
+    --card: 240 30% 10%;
+    --card-foreground: 220 30% 96%;
+
+    --popover: 240 30% 10%;
+    --popover-foreground: 220 30% 96%;
+
+    --primary: 280 90% 65%;
+    --primary-foreground: 240 30% 6%;
+
+    --secondary: 240 25% 14%;
+    --secondary-foreground: 220 20% 85%;
+
+    --muted: 240 25% 12%;
+    --muted-foreground: 240 10% 60%;
+
+    --accent: 190 95% 60%;
+    --accent-foreground: 240 30% 6%;
+
+    --destructive: 0 80% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 30% 20%;
+    --input: 240 30% 18%;
+    --ring: 280 90% 65%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 240 30% 8%;
+    --sidebar-foreground: 220 30% 96%;
+    --sidebar-primary: 280 90% 65%;
+    --sidebar-primary-foreground: 240 30% 6%;
+    --sidebar-accent: 240 25% 14%;
+    --sidebar-accent-foreground: 220 20% 85%;
+    --sidebar-border: 240 30% 18%;
+    --sidebar-ring: 280 90% 65%;
+
+    --glow-violet: 280 90% 65%;
+    --glow-cyan: 190 95% 60%;
+    --glow-pink: 330 90% 65%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+
+  html, body, #root { height: 100%; }
+
+  body {
+    @apply text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: hsl(var(--background));
+    background-image:
+      radial-gradient(at 15% 15%, hsl(var(--glow-violet) / 0.35) 0px, transparent 50%),
+      radial-gradient(at 85% 20%, hsl(var(--glow-cyan) / 0.25) 0px, transparent 55%),
+      radial-gradient(at 50% 95%, hsl(var(--glow-pink) / 0.22) 0px, transparent 55%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.01em; }
+}
+
+@layer utilities {
+  .glass {
+    background: hsl(var(--card) / 0.45);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+  .glass-strong {
+    background: hsl(var(--card) / 0.65);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid hsl(var(--border) / 0.7);
+  }
+  .text-gradient {
+    background: linear-gradient(120deg, hsl(var(--glow-violet)), hsl(var(--glow-cyan)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .ring-glow {
+    box-shadow:
+      0 0 0 1px hsl(var(--primary) / 0.4),
+      0 0 30px hsl(var(--primary) / 0.25);
+  }
+}
