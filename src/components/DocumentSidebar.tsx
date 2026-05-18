@@ -61,16 +61,29 @@ export function DocumentSidebar() {
         .from("documents").upload(path, file, { contentType: file.type || undefined });
       if (upErr) throw upErr;
 
-      const { data: doc, error: insErr } = await supabase
-        .from("documents").insert({
-          user_id: user.id, filename: file.name, storage_path: path,
-          mime_type: file.type, size_bytes: file.size, status: "pending",
-        }).select().single();
-      if (insErr) throw insErr;
+      // Generate a UUID for the document
+      const documentId = crypto.randomUUID();
+
+      // Call upload-document edge function to insert (uses SERVICE_ROLE_KEY, bypasses RLS)
+      const { data: funcRes, error: funcErr } = await supabase.functions.invoke(
+        "upload-document",
+        {
+          body: {
+            documentId,
+            userId: user.id,
+            filename: file.name,
+            storage_path: path,
+            mime_type: file.type,
+            size_bytes: file.size,
+          },
+        }
+      );
+      if (funcErr) throw funcErr;
+      if (!funcRes.success) throw new Error(funcRes.error);
 
       toast.success("Uploaded — indexing…");
       supabase.functions.invoke("ingest-document", {
-        body: { documentId: doc.id },
+        body: { documentId },
       }).then(({ error }) => {
         if (error) toast.error(`Indexing failed: ${error.message}`);
       });

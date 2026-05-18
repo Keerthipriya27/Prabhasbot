@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.security-chat]
 verify_jwt = false
+
+[functions.upload-document]
+verify_jwt = false
