@@ -62,14 +62,15 @@ export function DocumentSidebar() {
       if (upErr) throw upErr;
 
       const { data: doc, error: insErr } = await supabase
-        .from("documents").insert({
-          filename: file.name, 
-          storage_path: path,
-          mime_type: file.type, 
-          size_bytes: file.size, 
-          status: "pending",
-        }).select().single();
+        .rpc("insert_document", {
+          p_filename: file.name,
+          p_storage_path: path,
+          p_mime_type: file.type,
+          p_size_bytes: file.size,
+        });
       if (insErr) throw insErr;
+      
+      const documentId = doc;
 
       toast.success("Uploaded — indexing…");
       supabase.functions.invoke("ingest-document", {
