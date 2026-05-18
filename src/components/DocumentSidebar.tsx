@@ -59,7 +59,9 @@ export function DocumentSidebar() {
       const path = `${user.id}/${Date.now()}-${file.name}`;
       const { error: upErr } = await supabase.storage
         .from("documents").upload(path, file, { contentType: file.type || undefined });
-      if (upErr) throw upErr;
+      if (upErr) {
+        throw new Error(`Storage upload failed: ${upErr.message}`);
+      }
 
       let documentId: string;
 
@@ -88,7 +90,10 @@ export function DocumentSidebar() {
           .select("id")
           .single();
         if (insErr || !doc?.id) {
-          throw (insErr || rpcErr || new Error("Unable to create document record"));
+          const baseErr = insErr || rpcErr;
+          throw new Error(
+            `Document insert failed: ${baseErr?.message || "Unable to create document record"}`,
+          );
         }
         documentId = doc.id;
       }
