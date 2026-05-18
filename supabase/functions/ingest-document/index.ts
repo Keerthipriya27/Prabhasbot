@@ -27,7 +27,7 @@ function chunkText(text: string): string[] {
 }
 
 async function embedBatch(texts: string[], apiKey: string): Promise<number[][]> {
-  const resp = await fetch("https://api.openai.com/v1/embeddings", {
+  const resp = await fetch("https://openrouter.ai/api/v1/embeddings", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -57,8 +57,8 @@ Deno.serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY not configured");
+    const API_KEY = Deno.env.get("API_KEY");
+    if (!API_KEY) throw new Error("API_KEY not configured");
 
     const userClient = createClient(SUPABASE_URL, ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
     let inserted = 0;
     for (let i = 0; i < chunks.length; i += BATCH) {
       const batch = chunks.slice(i, i + BATCH);
-      const embeddings = await embedBatch(batch, OPENAI_API_KEY);
+      const embeddings = await embedBatch(batch, API_KEY);
       const rows = batch.map((content, j) => ({
         document_id: doc.id,
         user_id: userId,

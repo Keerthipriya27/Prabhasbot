@@ -20,7 +20,7 @@ Rules:
 - Be concise. Use markdown when helpful.`;
 
 async function embedQuery(text: string, apiKey: string): Promise<number[]> {
-  const resp = await fetch("https://api.openai.com/v1/embeddings", {
+  const resp = await fetch("https://openrouter.ai/api/v1/embeddings", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: EMBED_MODEL, input: text }),
@@ -43,8 +43,8 @@ Deno.serve(async (req) => {
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
+    const API_KEY = Deno.env.get("API_KEY");
+    if (!API_KEY) throw new Error("API_KEY is not configured");
 
     const userClient = createClient(SUPABASE_URL, ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
     let contextBlock = "";
     if (lastUser?.content) {
       try {
-        const embedding = await embedQuery(lastUser.content, OPENAI_API_KEY);
+        const embedding = await embedQuery(lastUser.content, API_KEY);
         const { data: matches, error: matchErr } = await userClient.rpc(
           "match_document_chunks",
           { query_embedding: embedding as unknown as string, match_count: TOP_K },
@@ -82,10 +82,10 @@ Deno.serve(async (req) => {
 
     const systemContent = BASE_SYSTEM + (contextBlock || "\n\n(No documents indexed yet.)");
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        Authorization: `Bearer ${API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

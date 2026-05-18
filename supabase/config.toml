@@ -1,4 +1,4 @@
-project_id = "xeojfqulesuerxtmzsil"
+project_id = "cwhjqthurdxltmacghpj"
 
 [functions.analyze-image]
 verify_jwt = false
@@ -7,4 +7,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.ingest-document]
+verify_jwt = false
+
+[functions.security-chat]
 verify_jwt = false
