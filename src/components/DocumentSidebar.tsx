@@ -61,20 +61,41 @@ export function DocumentSidebar() {
         .from("documents").upload(path, file, { contentType: file.type || undefined });
       if (upErr) throw upErr;
 
-      const { data: doc, error: insErr } = await supabase
+      let documentId: string;
+
+      // Prefer RPC insert when available, but fallback to direct insert.
+      const { data: rpcDocId, error: rpcErr } = await supabase
         .rpc("insert_document", {
           p_filename: file.name,
           p_storage_path: path,
           p_mime_type: file.type,
           p_size_bytes: file.size,
         });
-      if (insErr) throw insErr;
-      
-      const documentId = doc;
+
+      if (!rpcErr && rpcDocId) {
+        documentId = rpcDocId;
+      } else {
+        const { data: doc, error: insErr } = await supabase
+          .from("documents")
+          .insert({
+            user_id: user.id,
+            filename: file.name,
+            storage_path: path,
+            mime_type: file.type,
+            size_bytes: file.size,
+            status: "pending",
+          })
+          .select("id")
+          .single();
+        if (insErr || !doc?.id) {
+          throw (insErr || rpcErr || new Error("Unable to create document record"));
+        }
+        documentId = doc.id;
+      }
 
       toast.success("Uploaded — indexing…");
       supabase.functions.invoke("ingest-document", {
-        body: { documentId: doc.id },
+        body: { documentId },
       }).then(({ error }) => {
         if (error) toast.error(`Indexing failed: ${error.message}`);
       });
